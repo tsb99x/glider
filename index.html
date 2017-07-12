@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Glider</title>
+    <meta name="author" content="Anton Muravev" />
+    <meta name="description" content="In-browser Game of Life implementation" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="normalize.css" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+
+<body>
+    <noscript>
+        <strong>Please, enable JavaScript to run Glider</strong>
+    </noscript>
+
+    <div id="app-page" class="hidden">
+        <div class="header">
+            <div class="header-titular">
+                <div class="header-title">Glider</div>
+                <div class="header-badge">PROTOTYPE</div>
+            </div>
+            <a href="https://github.com/tsb99x/glider">GitHub</a>
+        </div>
+
+        <div id="container" class="content">
+            <div id="info" class="info-center">
+                <div class="info-aligner">
+                    <div class="info-row">In-browser <a href="https://en.wikipedia.org/wiki/Conway's_Game_of_Life">Game
+                            of Life</a> implementation</div>
+                    <div class="info-row">Ready to process <span id="x-size"></span> on <span id="y-size"></span> game
+                        field<br />Total cells count: <span id="total-size"></span></div>
+                    <div class="info-row">Press "randomize" at panel below to begin</div>
+                </div>
+            </div>
+
+            <canvas id="grid" class="hidden"></canvas>
+        </div>
+
+        <div class="controls">
+            <button id="btn-rand" title="randomize" class="controls-button">
+                randomize
+            </button>
+            <button id="btn-start" class="controls-icon-button" title="start" disabled>
+                <i i-start class="controls-icon"></i>
+            </button>
+            <button id="btn-step" class="controls-icon-button" title="step" disabled>
+                <i i-step class="controls-icon"></i>
+            </button>
+            <button id="btn-pause" class="controls-icon-button" title="pause" disabled>
+                <i i-pause class="controls-icon"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('app-page')
+            .classList
+            .remove('hidden')
+    </script>
+    <script src="script.js"></script>
+</body>
+
+</html>
