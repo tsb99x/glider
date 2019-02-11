@@ -7,7 +7,7 @@
   "repository": "github:tsb99x/glider",
   "description": "In-browser Game of Life implementation",
   "scripts": {
-    "build": "parcel build --no-cache --no-source-maps src/index.html",
+    "build": "parcel build --no-cache --no-source-maps --no-content-hash --public-url . src/index.html",
     "serve": "parcel serve src/index.html"
   },
   "dependencies": {
