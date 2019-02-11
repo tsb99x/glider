@@ -1,0 +1,21 @@
+{
+  "name": "glider",
+  "version": "2019.02.11",
+  "author": "Anton Muravyov",
+  "license": "MIT",
+  "private": true,
+  "repository": "github:tsb99x/glider",
+  "description": "In-browser Game of Life implementation",
+  "scripts": {
+    "build": "parcel build --no-cache --no-source-maps src/index.html",
+    "serve": "parcel serve src/index.html"
+  },
+  "dependencies": {
+    "normalize.css": "^8.0.1",
+    "parcel": "^1.11.0",
+    "typescript": "^3.3.3"
+  },
+  "devDependencies": {
+    "tslint": "^5.12.1"
+  }
+}
