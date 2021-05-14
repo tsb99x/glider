@@ -5,6 +5,5 @@ Hosted online at GitHub [Pages](https://tsb99x.github.io/glider).
 
 ## Build and develop
 
-- Install dependencies: `npm install`
-- To build the project: `npm run build`
-- Auto-reloading env: `npm run serve`
+Open an [index.html](./index.html) from a local filesystem in your favorite browser.
+A linter configuration is present, use `npx eslint .` to run [ESLint](https://eslint.org/).
