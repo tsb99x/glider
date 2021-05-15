@@ -11,7 +11,11 @@
 </head>
 
 <body>
-    <div class="app-page">
+    <noscript>
+        <strong>Please, enable JavaScript to run Glider</strong>
+    </noscript>
+
+    <div id="app-page" class="hidden">
         <div class="header">
             <div class="header-titular">
                 <div class="header-title">Glider</div>
@@ -50,6 +54,11 @@
         </div>
     </div>
 
+    <script>
+        document.getElementById('app-page')
+            .classList
+            .remove('hidden')
+    </script>
     <script src="script.js"></script>
 </body>
 
