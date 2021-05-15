@@ -21,24 +21,31 @@ function minstdRand(state) {
 /**
  * @param {number} width
  * @param {number} height
+ * @returns {number[][]}
+ */
+function buildMatrix(width, height) {
+    const res = []
+    for (let y = 0; y < height; y++) {
+        res.push([])
+        for (let x = 0; x < width; x++) {
+            res[y].push(0)
+        }
+    }
+    return res
+}
+
+/**
+ * @param {number} width
+ * @param {number} height
  */
 function Grid(width, height) {
     // + 2 is for borders padding compensation, so grid will be finite.
     width += 2
     height += 2
 
-    // Create 2D cells structure with every cell dead (0 state).
-    const cells = []
-    for (let y = 0; y < height; y++) {
-        cells.push([])
-        for (let x = 0; x < width; x++) {
-            cells[y].push(0)
-        }
-    }
-
     this.width = width
     this.height = height
-    this.cells = cells
+    this.cells = buildMatrix(width, height)
 }
 
 /**
