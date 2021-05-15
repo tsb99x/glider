@@ -6,8 +6,7 @@
  * @param {string} elementId
  */
 function identify(elementId) {
-    var res = document.getElementById(elementId)
-
+    const res = document.getElementById(elementId)
     if (!res) {
         throw new Error(`Failed to find element with id of '${elementId}' in document`)
     }
@@ -36,17 +35,15 @@ function minstdRand(state) {
  * @returns {Grid}
  */
 function initGrid(width, height) {
-    var cells, y, x
-
     // + 2 is for borders padding compensation, so grid will be finite.
     width += 2
     height += 2
 
     // Create 2D cells structure with every cell dead (0 state).
-    cells = []
-    for (y = 0; y < height; y++) {
+    const cells = []
+    for (let y = 0; y < height; y++) {
         cells.push([])
-        for (x = 0; x < width; x++) {
+        for (let x = 0; x < width; x++) {
             cells[y].push(0)
         }
     }
@@ -64,10 +61,8 @@ function initGrid(width, height) {
  * @param {() => number} rand
  */
 function randomizeGrid(grid, rand) {
-    var y, x
-
-    for (y = 1; y < grid.height - 1; y++) {
-        for (x = 1; x < grid.width - 1; x++) {
+    for (let y = 1; y < grid.height - 1; y++) {
+        for (let x = 1; x < grid.width - 1; x++) {
             grid.cells[y][x] = rand() % 2
         }
     }
@@ -78,11 +73,9 @@ function randomizeGrid(grid, rand) {
  * @param {Uint8ClampedArray} buffer
  */
 function packImageData(grid, buffer) {
-    var y, x, pixelOffset
-
-    for (y = 1; y < grid.height - 1; y++) {
-        for (x = 1; x < grid.width - 1; x++) {
-            pixelOffset = ((y - 1) * (grid.width - 2) + (x - 1)) * 4
+    for (let y = 1; y < grid.height - 1; y++) {
+        for (let x = 1; x < grid.width - 1; x++) {
+            const pixelOffset = ((y - 1) * (grid.width - 2) + (x - 1)) * 4
 
             // RGBA(34, 34, 34, 1) is just #222
             if (grid.cells[y][x] === 1) {
@@ -106,12 +99,10 @@ function packImageData(grid, buffer) {
  * @param {Grid} next
  */
 function transformTo(current, next) {
-    var row, col, neightborsAlive
-
-    for (row = 1; row < current.height - 1; row++) {
-        for (col = 1; col < current.width - 1; col++) {
+    for (let row = 1; row < current.height - 1; row++) {
+        for (let col = 1; col < current.width - 1; col++) {
             // Sum neighbors that are alive to count them.
-            neightborsAlive =
+            const neightborsAlive =
                 current.cells[row - 1][col - 1] +
                 current.cells[row - 1][col    ] +
                 current.cells[row - 1][col + 1] +
@@ -150,8 +141,7 @@ function transformTo(current, next) {
  * @returns {Automata}
  */
 function initAutomata(canvas) {
-    var context = canvas.getContext('2d')
-
+    const context = canvas.getContext('2d')
     if (!context) {
         throw new Error('Failed to instantiate canvas context')
     }
@@ -185,8 +175,7 @@ function drawActiveGrid(auto) {
  * @param {Automata} auto
  */
 function calcStep(auto) {
-    var temp = auto.activeGrid
-
+    const temp = auto.activeGrid
     auto.activeGrid = auto.passiveGrid
     auto.passiveGrid = temp
     transformTo(auto.passiveGrid, auto.activeGrid)
@@ -196,12 +185,10 @@ function calcStep(auto) {
  * @param {Automata} auto
  */
 function loop(auto) {
-    var iter
-
     if (auto.isRunning) {
         window.requestAnimationFrame(() => loop(auto))
 
-        for (iter = 0; iter < auto.iterationsPerRender; iter++) {
+        for (let iter = 0; iter < auto.iterationsPerRender; iter++) {
             calcStep(auto)
         }
 
@@ -263,8 +250,8 @@ function disableButtons() {
 }
 
 function expandGrid() {
-    var width = container.clientWidth
-    var height = container.clientHeight
+    const width = container.clientWidth
+    const height = container.clientHeight
 
     grid.width = width
     grid.height = height
@@ -283,22 +270,22 @@ function expandGrid() {
 
 // Page elements lookup
 
-var container = identify('container')
-var info = identify('info')
-var grid = identify('grid')
+const container = identify('container')
+const info = identify('info')
+const grid = identify('grid')
 
-var btnRand = identify('btn-rand')
-var btnStart = identify('btn-start')
-var btnStep = identify('btn-step')
-var btnPause = identify('btn-pause')
+const btnRand = identify('btn-rand')
+const btnStart = identify('btn-start')
+const btnStep = identify('btn-step')
+const btnPause = identify('btn-pause')
 
-var xSize = identify('x-size')
-var ySize = identify('y-size')
-var totalSize = identify('total-size')
+const xSize = identify('x-size')
+const ySize = identify('y-size')
+const totalSize = identify('total-size')
 
 // Automata initialization and window events
 
-var auto
+let auto
 expandGrid()
 window.addEventListener('resize', expandGrid)
 
