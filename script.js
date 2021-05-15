@@ -1,7 +1,5 @@
 'use strict'
 
-// Global utilities
-
 /**
  * @param {string} elementId
  */
@@ -20,21 +18,11 @@ function minstdRand(state) {
     return () => (state = 48271 * state % 2147483647)
 }
 
-// Grid implementation
-
-/**
- * @typedef {Object} Grid
- * @property {number} width
- * @property {number} height
- * @property {number[][]} cells
- */
-
 /**
  * @param {number} width
  * @param {number} height
- * @returns {Grid}
  */
-function initGrid(width, height) {
+function Grid(width, height) {
     // + 2 is for borders padding compensation, so grid will be finite.
     width += 2
     height += 2
@@ -48,37 +36,32 @@ function initGrid(width, height) {
         }
     }
 
-    return {
-        width,
-        height,
-        cells
-    }
+    this.width = width
+    this.height = height
+    this.cells = cells
 }
 
 /**
- *
- * @param {Grid} grid
  * @param {() => number} rand
  */
-function randomizeGrid(grid, rand) {
-    for (let y = 1; y < grid.height - 1; y++) {
-        for (let x = 1; x < grid.width - 1; x++) {
-            grid.cells[y][x] = rand() % 2
+Grid.prototype.randomize = function(rand) {
+    for (let y = 1; y < this.height - 1; y++) {
+        for (let x = 1; x < this.width - 1; x++) {
+            this.cells[y][x] = rand() % 2
         }
     }
 }
 
 /**
- * @param {Grid} grid
  * @param {Uint8ClampedArray} buffer
  */
-function packImageData(grid, buffer) {
-    for (let y = 1; y < grid.height - 1; y++) {
-        for (let x = 1; x < grid.width - 1; x++) {
-            const pixelOffset = ((y - 1) * (grid.width - 2) + (x - 1)) * 4
+Grid.prototype.packImageData = function(buffer) {
+    for (let y = 1; y < this.height - 1; y++) {
+        for (let x = 1; x < this.width - 1; x++) {
+            const pixelOffset = ((y - 1) * (this.width - 2) + (x - 1)) * 4
 
             // RGBA(34, 34, 34, 1) is just #222
-            if (grid.cells[y][x] === 1) {
+            if (this.cells[y][x] === 1) {
                 buffer[pixelOffset + 0] = 34
                 buffer[pixelOffset + 1] = 34
                 buffer[pixelOffset + 2] = 34
@@ -95,27 +78,26 @@ function packImageData(grid, buffer) {
 }
 
 /**
- * @param {Grid} current
  * @param {Grid} next
  */
-function transformTo(current, next) {
-    for (let row = 1; row < current.height - 1; row++) {
-        for (let col = 1; col < current.width - 1; col++) {
+Grid.prototype.transformTo = function(next) {
+    for (let row = 1; row < this.height - 1; row++) {
+        for (let col = 1; col < this.width - 1; col++) {
             // Sum neighbors that are alive to count them.
             const neightborsAlive =
-                current.cells[row - 1][col - 1] +
-                current.cells[row - 1][col    ] +
-                current.cells[row - 1][col + 1] +
-                current.cells[row    ][col - 1] +
-                current.cells[row    ][col + 1] +
-                current.cells[row + 1][col - 1] +
-                current.cells[row + 1][col    ] +
-                current.cells[row + 1][col + 1]
+                this.cells[row - 1][col - 1] +
+                this.cells[row - 1][col    ] +
+                this.cells[row - 1][col + 1] +
+                this.cells[row    ][col - 1] +
+                this.cells[row    ][col + 1] +
+                this.cells[row + 1][col - 1] +
+                this.cells[row + 1][col    ] +
+                this.cells[row + 1][col + 1]
 
             // Check if cell will be alive by Conway's Life rules.
             if (neightborsAlive === 3) {
                 next.cells[row][col] = 1
-            } else if (neightborsAlive === 2 && current.cells[row][col] === 1) {
+            } else if (neightborsAlive === 2 && this.cells[row][col] === 1) {
                 next.cells[row][col] = 1
             } else {
                 next.cells[row][col] = 0
@@ -124,102 +106,65 @@ function transformTo(current, next) {
     }
 }
 
-// Automata implementation
-
-/**
- * @typedef {Object} Automata
- * @property {boolean} isRunning
- * @property {number} iterationsPerRender
- * @property {CanvasRenderingContext2D} context
- * @property {ImageData} imageData
- * @property {Grid} activeGrid
- * @property {Grid} passiveGrid
- */
-
 /**
  * @param {HTMLCanvasElement} canvas
- * @returns {Automata}
  */
-function initAutomata(canvas) {
+function Automata(canvas) {
     const context = canvas.getContext('2d')
     if (!context) {
         throw new Error('Failed to instantiate canvas context')
     }
 
-    return {
-        isRunning: false,
-        iterationsPerRender: 1,
-        context,
-        imageData: context.createImageData(canvas.width, canvas.height),
-        activeGrid: initGrid(canvas.width, canvas.height),
-        passiveGrid: initGrid(canvas.width, canvas.height),
-    }
+    this.isRunning = false
+    this.iterationsPerRender = 1
+    this.context = context
+    this.imageData = context.createImageData(canvas.width, canvas.height)
+    this.activeGrid = new Grid(canvas.width, canvas.height)
+    this.passiveGrid = new Grid(canvas.width, canvas.height)
 }
 
-/**
- * @param {Automata} auto
- */
-function randomizeAutomata(auto) {
-    randomizeGrid(auto.activeGrid, minstdRand(Date.now()))
+Automata.prototype.randomize = function() {
+    const rand = minstdRand(Date.now())
+    this.activeGrid.randomize(rand)
 }
 
-/**
- * @param {Automata} auto
- */
-function drawActiveGrid(auto) {
-    packImageData(auto.activeGrid, auto.imageData.data)
-    auto.context.putImageData(auto.imageData, 0, 0)
+Automata.prototype.draw = function() {
+    this.activeGrid.packImageData(this.imageData.data)
+    this.context.putImageData(this.imageData, 0, 0)
 }
 
-/**
- * @param {Automata} auto
- */
-function calcStep(auto) {
-    const temp = auto.activeGrid
-    auto.activeGrid = auto.passiveGrid
-    auto.passiveGrid = temp
-    transformTo(auto.passiveGrid, auto.activeGrid)
+Automata.prototype.calcStep = function() {
+    const temp = this.activeGrid
+    this.activeGrid = this.passiveGrid
+    this.passiveGrid = temp
+    this.passiveGrid.transformTo(this.activeGrid)
 }
 
-/**
- * @param {Automata} auto
- */
-function loop(auto) {
-    if (auto.isRunning) {
-        window.requestAnimationFrame(() => loop(auto))
+Automata.prototype.loop = function() {
+    if (this.isRunning) {
+        window.requestAnimationFrame(() => this.loop())
 
-        for (let iter = 0; iter < auto.iterationsPerRender; iter++) {
-            calcStep(auto)
+        for (let iter = 0; iter < this.iterationsPerRender; iter++) {
+            this.calcStep()
         }
 
-        drawActiveGrid(auto)
+        this.draw()
     }
 }
 
-/**
- * @param {Automata} auto
- */
-function doStart(auto) {
-    auto.isRunning = true
-    loop(auto)
+Automata.prototype.doStart = function() {
+    this.isRunning = true
+    this.loop()
 }
 
-/**
- * @param {Automata} auto
- */
-function doStep(auto) {
-    calcStep(auto)
-    drawActiveGrid(auto)
+Automata.prototype.doStep = function() {
+    this.calcStep()
+    this.draw()
 }
 
-/**
- * @param {Automata} auto
- */
-function doPause(auto) {
-    auto.isRunning = false
+Automata.prototype.doPause = function() {
+    this.isRunning = false
 }
-
-// Global update actions.
 
 /**
  * @param {boolean} isGrid
@@ -261,14 +206,12 @@ function expandGrid() {
     totalSize.innerText = (width * height).toString()
 
     if (auto) {
-        doPause(auto)
+        auto.doPause()
     }
 
     updateViews(false)
     disableButtons()
 }
-
-// Page elements lookup
 
 const container = identify('container')
 const info = identify('info')
@@ -283,38 +226,34 @@ const xSize = identify('x-size')
 const ySize = identify('y-size')
 const totalSize = identify('total-size')
 
-// Automata initialization and window events
-
 let auto
 expandGrid()
 window.addEventListener('resize', expandGrid)
 
-// Button-specific binds
-
 btnRand.addEventListener('click', () => {
     if (auto) {
-        doPause(auto)
+        auto.doPause()
     }
 
     expandGrid()
-    auto = initAutomata(grid)
-    randomizeAutomata(auto)
-    drawActiveGrid(auto)
+    auto = new Automata(grid)
+    auto.randomize()
+    auto.draw()
 
     updateViews(true)
     updateButtons(auto.isRunning)
 })
 
 btnStart.addEventListener('click', () => {
-    doStart(auto)
+    auto.doStart()
     updateButtons(auto.isRunning)
 })
 
 btnStep.addEventListener('click', () => {
-    doStep(auto)
+    auto.doStep()
 })
 
 btnPause.addEventListener('click', () => {
-    doPause(auto)
+    auto.doPause()
     updateButtons(auto.isRunning)
 })
