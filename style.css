@@ -3,6 +3,10 @@
     font-family: Consolas, monaco, monospace;
 }
 
+canvas {
+    image-rendering: pixelated;
+}
+
 .hidden {
     display: none !important;
 }
